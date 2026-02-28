@@ -108,6 +108,9 @@
             background: conic-gradient(from 180deg, transparent, transparent 15%, var(--white-bright), var(--neon-glow), transparent 45%);
             transform: rotate(-45deg); 
             display: none;
+            /* Mask center to keep it only on edge */
+            -webkit-mask-image: radial-gradient(circle, transparent 65%, black 66%);
+            mask-image: radial-gradient(circle, transparent 65%, black 66%);
         }
 
         .diamond-inner {
@@ -316,23 +319,18 @@
         let isLogoLoaded = false;
         let workerBlobUrl = null;
         
-        // Discord URL provided by user
         const DISCORD_IMAGE_URL = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
 
         const logoImg = new Image();
 
         async function prepareAssets() {
-            // 1. Setup Logo Image with Cross-Origin Bypass
-            // We use a blob approach to ensure the canvas isn't tainted
             async function fetchAndLoadImage(url) {
                 try {
-                    // Try direct fetch first
                     let response = await fetch(url);
                     if (!response.ok) throw new Error();
                     const blob = await response.blob();
                     logoImg.src = URL.createObjectURL(blob);
                 } catch (e) {
-                    // Fallback to CORS proxy if Discord blocks direct fetch
                     console.warn("Direct fetch blocked by CORS, trying proxy...");
                     const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
                     try {
@@ -355,7 +353,6 @@
 
             fetchAndLoadImage(DISCORD_IMAGE_URL);
 
-            // 2. Prepare Worker (Bypass SecurityError: Failed to construct 'Worker')
             try {
                 const workerResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
                 const workerCode = await workerResponse.text();
@@ -425,20 +422,37 @@
         function drawDiamondPiece(ctx, x, y, size, rotationDeg, progress) {
             ctx.save();
             ctx.translate(x, y);
+            
+            // Draw standard diamond background
+            ctx.save();
             ctx.rotate(45 * Math.PI / 180);
-
             ctx.beginPath();
             ctx.rect(-size/2, -size/2, size, size);
             ctx.fillStyle = "#0c061d";
             ctx.fill();
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-            ctx.lineWidth = 2;
-            ctx.stroke();
             
+            // Draw subtle static border
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.restore();
+            
+            // Draw rotating edge glow
             if (progress > 0) {
                 ctx.save();
-                ctx.clip();
-                ctx.rotate(-45 * Math.PI / 180);
+                ctx.rotate(45 * Math.PI / 180);
+                
+                // Define the diamond path for clipping/stroking
+                ctx.beginPath();
+                ctx.rect(-size/2, -size/2, size, size);
+                
+                // Use stroke clip logic to only draw on edge
+                ctx.lineWidth = 8;
+                ctx.globalCompositeOperation = 'source-over';
+                
+                // Draw the sweeping gradient glow on the stroke only
+                ctx.save();
+                ctx.rotate(-45 * Math.PI / 180); // Unrotate so gradient spins relative to screen
                 ctx.rotate(progress * Math.PI * 2);
                 
                 const grad = ctx.createConicGradient(0, 0, 0);
@@ -447,19 +461,22 @@
                 grad.addColorStop(0.2, "rgba(168, 85, 247, 1)");
                 grad.addColorStop(0.4, "transparent");
                 
-                ctx.fillStyle = grad;
-                ctx.fillRect(-size * 1.5, -size * 1.5, size * 3, size * 3);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 10;
+                ctx.stroke();
+                ctx.restore();
+                
                 ctx.restore();
             }
-            ctx.restore();
 
+            // Draw Logo
             if (isLogoLoaded && logoImg.complete && logoImg.naturalWidth !== 0) {
                 const pulse = 1 + Math.sin(Date.now() / 500) * 0.04;
                 const imgSize = 200 * (progress > 0 ? pulse : 1);
                 ctx.save();
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
-                ctx.drawImage(logoImg, x - imgSize/2, y - imgSize/2, imgSize, imgSize);
+                ctx.drawImage(logoImg, -imgSize/2, -imgSize/2, imgSize, imgSize);
                 ctx.restore();
             } else {
                 ctx.fillStyle = "white";
@@ -468,8 +485,9 @@
                 ctx.textBaseline = "middle";
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
-                ctx.fillText("NTE", x, y);
+                ctx.fillText("NTE", 0, 0);
             }
+            ctx.restore();
         }
 
         const particles = Array.from({ length: 45 }, () => ({
