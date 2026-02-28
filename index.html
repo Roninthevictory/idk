@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The New Era - Discord Banner Box</title>
+    <!-- Include GIF.js for high-quality export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&display=swap');
+
+        :root {
+            --neon-purple: #c026d3;
+            --neon-glow: #a855f7;
+            --bg-deep: #0c061d;
+            --white-bright: #ffffff;
+            --success-green: #22c55e;
+            --error-red: #ef4444;
+            --banner-width: 960px;
+            --banner-height: 540px;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto;
+            font-family: 'Merriweather', serif;
+        }
+
+        .banner-box {
+            position: relative;
+            width: var(--banner-width);
+            height: var(--banner-height);
+            background-color: var(--bg-deep);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: scale(min(1, calc(90vw / 960)));
+        }
+
+        .enchanted-bg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0f0524 0%, #1a0b3c 25%, #3b0764 50%, #1a0b3c 75%, #0f0524 100%);
+            background-size: 400% 400%;
+            animation: enchantedMove 8s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes enchantedMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #border-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .diamond-wrapper {
+            position: relative;
+            width: 280px; 
+            height: 280px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .diamond-border-container {
+            position: absolute;
+            width: 220px; height: 220px;
+            transform: rotate(45deg);
+            padding: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
+        }
+
+        .diamond-border-inner-glow {
+            position: absolute;
+            width: 250%; height: 250%;
+            background: conic-gradient(from 180deg, transparent, transparent 15%, var(--white-bright), var(--neon-glow), transparent 45%);
+            transform: rotate(-45deg); 
+            display: none;
+        }
+
+        .diamond-inner {
+            position: relative;
+            width: 100%; height: 100%;
+            background: #0c061d;
+            z-index: 2;
+        }
+
+        .nte-image {
+            position: absolute;
+            width: 200px; height: 200px;
+            z-index: 5;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--neon-purple)) brightness(1.2);
+            animation: ntePulse 3s ease-in-out infinite alternate;
+        }
+
+        .nte-fallback {
+            position: absolute;
+            z-index: 6;
+            color: white;
+            font-size: 60px;
+            font-weight: bold;
+            text-shadow: 0 0 20px var(--neon-purple);
+            display: none;
+        }
+
+        @keyframes ntePulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.08); }
+        }
+
+        canvas#sparkle-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .controls-area {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .btn-export {
+            background: linear-gradient(45deg, var(--neon-purple), var(--neon-glow));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-export:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
+        }
+
+        .btn-export:disabled {
+            background: #444;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            width: 200px;
+            height: 10px;
+            background: #222;
+            border-radius: 5px;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--success-green);
+            transition: width 0.1s;
+        }
+
+        .loop-controls {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .indicator-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loop-flash {
+            width: 80px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loop-flash-inner {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+        }
+
+        .flash-green { background: var(--success-green); box-shadow: 0 0 12px var(--success-green); }
+        .flash-red { background: var(--error-red); box-shadow: 0 0 12px var(--error-red); }
+
+        .loop-text {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .active-flash {
+            animation: flashAnim 1s ease-out forwards;
+        }
+
+        @keyframes flashAnim {
+            0% { opacity: 1; transform: scaleX(1.2); filter: brightness(1.5); }
+            100% { opacity: 0; transform: scaleX(0.8); filter: brightness(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="banner-box" id="banner">
+        <div class="enchanted-bg" id="main-bg"></div>
+        <canvas id="border-canvas"></canvas>
+        <canvas id="sparkle-canvas"></canvas>
+
+        <div class="logo-container">
+            <div class="diamond-wrapper">
+                <div class="diamond-border-container">
+                    <div id="diamond-glow" class="diamond-border-inner-glow"></div>
+                    <div class="diamond-inner"></div>
+                </div>
+                <div id="fallback-text" class="nte-fallback">NTE</div>
+                <img id="logo-img" class="nte-image" alt="NTE Logo" style="display:none;">
+            </div>
+        </div>
+    </div>
+
+    <div class="controls-area">
+        <div class="loop-controls">
+            <div class="indicator-group">
+                <div class="loop-flash"><div id="flash-start" class="loop-flash-inner flash-green"></div></div>
+                <div class="loop-text">Loop Start</div>
+            </div>
+            <div class="indicator-group">
+                <div class="loop-flash"><div id="flash-end" class="loop-flash-inner flash-red"></div></div>
+                <div class="loop-text">Loop End</div>
+            </div>
+        </div>
+
+        <button id="export-btn" class="btn-export">Record Diamond Only GIF</button>
+        <div id="progress-container" class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+    </div>
+
+    <canvas id="capture-canvas" width="400" height="400" style="display:none;"></canvas>
+
+    <script>
+        const sparkleCanvas = document.getElementById('sparkle-canvas');
+        const borderCanvas = document.getElementById('border-canvas');
+        const captureCanvas = document.getElementById('capture-canvas');
+        const flashStart = document.getElementById('flash-start');
+        const flashEnd = document.getElementById('flash-end');
+        const diamondGlow = document.getElementById('diamond-glow');
+        const exportBtn = document.getElementById('export-btn');
+        const progContainer = document.getElementById('progress-container');
+        const progBar = document.getElementById('progress-bar');
+        const logoImgElement = document.getElementById('logo-img');
+        const fallbackText = document.getElementById('fallback-text');
+        
+        const sCtx = sparkleCanvas.getContext('2d');
+        const bCtx = borderCanvas.getContext('2d');
+        const cCtx = captureCanvas.getContext('2d');
+        
+        const WIDTH = 960;
+        const HEIGHT = 540;
+        const BORDER_THICKNESS = 18;
+
+        sparkleCanvas.width = borderCanvas.width = WIDTH;
+        sparkleCanvas.height = borderCanvas.height = HEIGHT;
+
+        let isLogoLoaded = false;
+        let workerBlobUrl = null;
+        
+        // Discord URL provided by user
+        const DISCORD_IMAGE_URL = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
+
+        const logoImg = new Image();
+
+        async function prepareAssets() {
+            // 1. Setup Logo Image with Cross-Origin Bypass
+            // We use a blob approach to ensure the canvas isn't tainted
+            async function fetchAndLoadImage(url) {
+                try {
+                    // Try direct fetch first
+                    let response = await fetch(url);
+                    if (!response.ok) throw new Error();
+                    const blob = await response.blob();
+                    logoImg.src = URL.createObjectURL(blob);
+                } catch (e) {
+                    // Fallback to CORS proxy if Discord blocks direct fetch
+                    console.warn("Direct fetch blocked by CORS, trying proxy...");
+                    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+                    try {
+                        const response = await fetch(proxyUrl);
+                        const blob = await response.blob();
+                        logoImg.src = URL.createObjectURL(blob);
+                    } catch (proxyError) {
+                        console.error("All fetch methods failed.");
+                        fallbackText.style.display = 'block';
+                    }
+                }
+            }
+
+            logoImg.onload = () => {
+                logoImgElement.src = logoImg.src;
+                logoImgElement.style.display = 'block';
+                fallbackText.style.display = 'none';
+                isLogoLoaded = true;
+            };
+
+            fetchAndLoadImage(DISCORD_IMAGE_URL);
+
+            // 2. Prepare Worker (Bypass SecurityError: Failed to construct 'Worker')
+            try {
+                const workerResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
+                const workerCode = await workerResponse.text();
+                const blob = new Blob([workerCode], { type: 'application/javascript' });
+                workerBlobUrl = URL.createObjectURL(blob);
+            } catch (e) {
+                console.error("Worker fetch failed.", e);
+            }
+        }
+        prepareAssets();
+
+        const perimeter = (WIDTH * 2) + (HEIGHT * 2);
+        
+        function getPointOnPerimeter(dist) {
+            dist = ((dist % perimeter) + perimeter) % perimeter;
+            if (dist < WIDTH) return { x: dist, y: 0 };
+            if (dist < WIDTH + HEIGHT) return { x: WIDTH, y: dist - WIDTH };
+            if (dist < WIDTH * 2 + HEIGHT) return { x: WIDTH - (dist - (WIDTH + HEIGHT)), y: HEIGHT };
+            return { x: 0, y: HEIGHT - (dist - (WIDTH * 2 + HEIGHT)) };
+        }
+
+        let frameCount = 0;
+        const ANIMATION_FRAMES = 180;
+        const DELAY_FRAMES = 120;
+        const TOTAL_CYCLE = ANIMATION_FRAMES + DELAY_FRAMES; 
+
+        function drawSingleChaser(ctx, progress) {
+            const lineLength = perimeter * 0.75;
+            const totalTravel = perimeter + lineLength; 
+            const headDist = progress * totalTravel;
+            
+            ctx.save();
+            ctx.lineCap = "round";
+            ctx.lineJoin = "round";
+            ctx.beginPath();
+            
+            let firstPoint = true;
+            const steps = 300; 
+            for (let i = 0; i <= steps; i++) {
+                const ratio = i / steps;
+                const dist = headDist - (lineLength * (1 - ratio));
+                if (dist >= 0 && dist <= perimeter) {
+                    const pos = getPointOnPerimeter(dist);
+                    if (firstPoint) {
+                        ctx.moveTo(pos.x, pos.y);
+                        firstPoint = false;
+                    } else {
+                        ctx.lineTo(pos.x, pos.y);
+                    }
+                }
+            }
+
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
+            ctx.strokeStyle = "rgba(192, 38, 211, 0.9)";
+            ctx.lineWidth = BORDER_THICKNESS;
+            ctx.stroke();
+
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "white";
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = BORDER_THICKNESS * 0.35;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawDiamondPiece(ctx, x, y, size, rotationDeg, progress) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(45 * Math.PI / 180);
+
+            ctx.beginPath();
+            ctx.rect(-size/2, -size/2, size, size);
+            ctx.fillStyle = "#0c061d";
+            ctx.fill();
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            if (progress > 0) {
+                ctx.save();
+                ctx.clip();
+                ctx.rotate(-45 * Math.PI / 180);
+                ctx.rotate(progress * Math.PI * 2);
+                
+                const grad = ctx.createConicGradient(0, 0, 0);
+                grad.addColorStop(0, "transparent");
+                grad.addColorStop(0.1, "white");
+                grad.addColorStop(0.2, "rgba(168, 85, 247, 1)");
+                grad.addColorStop(0.4, "transparent");
+                
+                ctx.fillStyle = grad;
+                ctx.fillRect(-size * 1.5, -size * 1.5, size * 3, size * 3);
+                ctx.restore();
+            }
+            ctx.restore();
+
+            if (isLogoLoaded && logoImg.complete && logoImg.naturalWidth !== 0) {
+                const pulse = 1 + Math.sin(Date.now() / 500) * 0.04;
+                const imgSize = 200 * (progress > 0 ? pulse : 1);
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
+                ctx.drawImage(logoImg, x - imgSize/2, y - imgSize/2, imgSize, imgSize);
+                ctx.restore();
+            } else {
+                ctx.fillStyle = "white";
+                ctx.font = "bold 60px Merriweather";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
+                ctx.fillText("NTE", x, y);
+            }
+        }
+
+        const particles = Array.from({ length: 45 }, () => ({
+            x: Math.random() * WIDTH,
+            y: Math.random() * HEIGHT,
+            size: Math.random() * 1.5 + 0.5,
+            speed: Math.random() * 0.15 + 0.05,
+            opacity: Math.random() * 0.4,
+            fade: Math.random() * 0.002 + 0.001
+        }));
+
+        function animate() {
+            frameCount = (frameCount + 1) % TOTAL_CYCLE;
+            sCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            bCtx.clearRect(0, 0, WIDTH, HEIGHT);
+
+            if (frameCount >= DELAY_FRAMES) {
+                const progress = (frameCount - DELAY_FRAMES) / ANIMATION_FRAMES;
+                drawSingleChaser(bCtx, progress);
+                diamondGlow.style.display = 'block';
+                const rotation = -45 + (progress * 360);
+                diamondGlow.style.transform = `rotate(${rotation}deg)`;
+
+                if (frameCount === DELAY_FRAMES) triggerFlash(flashStart);
+                if (frameCount === TOTAL_CYCLE - 1) triggerFlash(flashEnd);
+            } else {
+                diamondGlow.style.display = 'none';
+            }
+
+            particles.forEach(p => {
+                p.y -= p.speed;
+                p.opacity -= p.fade;
+                if (p.y < -5 || p.opacity <= 0) {
+                    p.x = Math.random() * WIDTH;
+                    p.y = HEIGHT + 5;
+                    p.opacity = Math.random() * 0.4;
+                }
+                sCtx.beginPath();
+                sCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                sCtx.fillStyle = `rgba(216, 180, 254, ${p.opacity})`;
+                sCtx.fill();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        function triggerFlash(element) {
+            element.classList.remove('active-flash');
+            void element.offsetWidth; 
+            element.classList.add('active-flash');
+        }
+
+        exportBtn.onclick = async () => {
+            if (!workerBlobUrl) {
+                alert("GIF engine is still loading. Please try again in a moment.");
+                return;
+            }
+
+            exportBtn.disabled = true;
+            exportBtn.innerText = "Capturing Diamond...";
+            progContainer.style.display = 'block';
+            
+            const CAP_SIZE = 400;
+            captureCanvas.width = CAP_SIZE;
+            captureCanvas.height = CAP_SIZE;
+
+            const gif = new GIF({
+                workers: 2,
+                quality: 5,
+                width: CAP_SIZE,
+                height: CAP_SIZE,
+                workerScript: workerBlobUrl,
+                transparent: 'rgba(0,0,0,0)' 
+            });
+
+            for (let f = 0; f < TOTAL_CYCLE; f++) {
+                cCtx.clearRect(0, 0, CAP_SIZE, CAP_SIZE);
+                let progress = f >= DELAY_FRAMES ? (f - DELAY_FRAMES) / ANIMATION_FRAMES : 0;
+
+                drawDiamondPiece(cCtx, CAP_SIZE/2, CAP_SIZE/2, 220, 0, progress);
+
+                try {
+                    gif.addFrame(cCtx, {copy: true, delay: 1000/60});
+                } catch (e) {
+                    console.error("Frame capture failed:", e);
+                    break;
+                }
+                
+                const p = Math.round((f / TOTAL_CYCLE) * 50);
+                progBar.style.width = p + "%";
+            }
+
+            gif.on('progress', (p) => {
+                progBar.style.width = (50 + (p * 50)) + "%";
+            });
+
+            gif.on('finished', (blob) => {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'nte-diamond-only.gif';
+                link.click();
+                
+                exportBtn.disabled = false;
+                exportBtn.innerText = "Record Diamond Only GIF";
+                progContainer.style.display = 'none';
+                progBar.style.width = "0%";
+            });
+
+            gif.render();
+        };
+
+        animate();
+    </script>
+</body>
+</html>
