@@ -224,14 +224,14 @@
         const logoImg = new Image();
         // Since Discord links often fail with CORS in canvas, we use a fallback if needed or ensure the URL is clean.
         // For reliability in this environment, I'm switching to the local filename reference we had earlier which is more stable.
-        logoImg.src = "Gemini_Generated_Image_ipe8bsipe8bsipe8__1_-removebg-preview-removebg-preview.png";
+        logoImg.src = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
 
         async function init() {
             logoImg.onload = () => { isLogoLoaded = true; };
             logoImg.onerror = () => { 
                 console.warn("Logo failed to load from primary source. Attempting fallback...");
                 // Final fallback to a generic placeholder if everything fails
-                logoImg.src = "https://via.placeholder.com/200/c026d3/ffffff?text=NTE";
+                logoImg.src = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
             };
 
             try {
