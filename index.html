@@ -64,84 +64,12 @@
             100% { background-position: 0% 50%; }
         }
 
-        #border-canvas {
+        #main-canvas {
             position: absolute;
             top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 25;
             pointer-events: none;
-        }
-
-        .logo-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            z-index: 10;
-        }
-
-        .diamond-wrapper {
-            position: relative;
-            width: 280px; 
-            height: 280px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .diamond-border-container {
-            position: absolute;
-            width: 220px; height: 220px;
-            transform: rotate(45deg);
-            padding: 6px;
-            background: rgba(255, 255, 255, 0.05);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            box-shadow: 0 0 50px rgba(168, 85, 247, 0.4);
-        }
-
-        .diamond-border-inner-glow {
-            position: absolute;
-            width: 250%; height: 250%;
-            background: conic-gradient(from 180deg, transparent, transparent 15%, var(--white-bright), var(--neon-glow), transparent 45%);
-            transform: rotate(-45deg); 
-            display: none;
-            /* Mask center to keep it only on edge */
-            -webkit-mask-image: radial-gradient(circle, transparent 65%, black 66%);
-            mask-image: radial-gradient(circle, transparent 65%, black 66%);
-        }
-
-        .diamond-inner {
-            position: relative;
-            width: 100%; height: 100%;
-            background: #0c061d;
-            z-index: 2;
-        }
-
-        .nte-image {
-            position: absolute;
-            width: 200px; height: 200px;
-            z-index: 5;
-            object-fit: contain;
-            filter: drop-shadow(0 0 20px var(--neon-purple)) brightness(1.2);
-            animation: ntePulse 3s ease-in-out infinite alternate;
-        }
-
-        .nte-fallback {
-            position: absolute;
-            z-index: 6;
-            color: white;
-            font-size: 60px;
-            font-weight: bold;
-            text-shadow: 0 0 20px var(--neon-purple);
-            display: none;
-        }
-
-        @keyframes ntePulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.08); }
         }
 
         canvas#sparkle-canvas {
@@ -180,12 +108,6 @@
             box-shadow: 0 0 25px rgba(168, 85, 247, 0.6);
         }
 
-        .btn-export:disabled {
-            background: #444;
-            cursor: not-allowed;
-            transform: none;
-        }
-
         .progress-container {
             width: 200px;
             height: 10px;
@@ -199,7 +121,6 @@
             height: 100%;
             width: 0%;
             background: var(--success-green);
-            transition: width 0.1s;
         }
 
         .loop-controls {
@@ -222,7 +143,6 @@
             background: rgba(255, 255, 255, 0.05);
             border-radius: 2px;
             position: relative;
-            overflow: hidden;
         }
 
         .loop-flash-inner {
@@ -235,20 +155,13 @@
         .flash-green { background: var(--success-green); box-shadow: 0 0 12px var(--success-green); }
         .flash-red { background: var(--error-red); box-shadow: 0 0 12px var(--error-red); }
 
-        .loop-text {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
         .active-flash {
             animation: flashAnim 1s ease-out forwards;
         }
 
         @keyframes flashAnim {
-            0% { opacity: 1; transform: scaleX(1.2); filter: brightness(1.5); }
-            100% { opacity: 0; transform: scaleX(0.8); filter: brightness(1); }
+            0% { opacity: 1; }
+            100% { opacity: 0; }
         }
 
     </style>
@@ -256,35 +169,24 @@
 <body>
 
     <div class="banner-box" id="banner">
-        <div class="enchanted-bg" id="main-bg"></div>
-        <canvas id="border-canvas"></canvas>
+        <div class="enchanted-bg"></div>
         <canvas id="sparkle-canvas"></canvas>
-
-        <div class="logo-container">
-            <div class="diamond-wrapper">
-                <div class="diamond-border-container">
-                    <div id="diamond-glow" class="diamond-border-inner-glow"></div>
-                    <div class="diamond-inner"></div>
-                </div>
-                <div id="fallback-text" class="nte-fallback">NTE</div>
-                <img id="logo-img" class="nte-image" alt="NTE Logo" style="display:none;">
-            </div>
-        </div>
+        <canvas id="main-canvas"></canvas>
     </div>
 
     <div class="controls-area">
         <div class="loop-controls">
             <div class="indicator-group">
                 <div class="loop-flash"><div id="flash-start" class="loop-flash-inner flash-green"></div></div>
-                <div class="loop-text">Loop Start</div>
+                <div class="loop-text" style="color:#aaa; font-size:10px; text-transform:uppercase;">Start</div>
             </div>
             <div class="indicator-group">
                 <div class="loop-flash"><div id="flash-end" class="loop-flash-inner flash-red"></div></div>
-                <div class="loop-text">Loop End</div>
+                <div class="loop-text" style="color:#aaa; font-size:10px; text-transform:uppercase;">End</div>
             </div>
         </div>
 
-        <button id="export-btn" class="btn-export">Record Diamond Only GIF</button>
+        <button id="export-btn" class="btn-export">Record Taller Diamond GIF</button>
         <div id="progress-container" class="progress-container">
             <div id="progress-bar" class="progress-bar"></div>
         </div>
@@ -294,78 +196,47 @@
 
     <script>
         const sparkleCanvas = document.getElementById('sparkle-canvas');
-        const borderCanvas = document.getElementById('border-canvas');
+        const mainCanvas = document.getElementById('main-canvas');
         const captureCanvas = document.getElementById('capture-canvas');
         const flashStart = document.getElementById('flash-start');
         const flashEnd = document.getElementById('flash-end');
-        const diamondGlow = document.getElementById('diamond-glow');
         const exportBtn = document.getElementById('export-btn');
         const progContainer = document.getElementById('progress-container');
         const progBar = document.getElementById('progress-bar');
-        const logoImgElement = document.getElementById('logo-img');
-        const fallbackText = document.getElementById('fallback-text');
         
         const sCtx = sparkleCanvas.getContext('2d');
-        const bCtx = borderCanvas.getContext('2d');
+        const mCtx = mainCanvas.getContext('2d');
         const cCtx = captureCanvas.getContext('2d');
         
         const WIDTH = 960;
         const HEIGHT = 540;
-        const BORDER_THICKNESS = 18;
+        
+        // Taller Diamond Dimensions
+        const BASE_WIDTH = 260;
+        const BASE_HEIGHT = 320; // Reduced by exactly 20px from 340
 
-        sparkleCanvas.width = borderCanvas.width = WIDTH;
-        sparkleCanvas.height = borderCanvas.height = HEIGHT;
+        sparkleCanvas.width = mainCanvas.width = WIDTH;
+        sparkleCanvas.height = mainCanvas.height = HEIGHT;
 
         let isLogoLoaded = false;
         let workerBlobUrl = null;
         
-        const DISCORD_IMAGE_URL = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
-
         const logoImg = new Image();
+        const LOGO_URL = "https://cdn.discordapp.com/attachments/1472369421296074970/1477423481246454014/tnelogonobg.png?ex=69a4b557&is=69a363d7&hm=e27e2e37ab96e8b741c952d9b0e65ab6959062d822be9a199b8d0b37a41b58b5&";
 
-        async function prepareAssets() {
-            async function fetchAndLoadImage(url) {
-                try {
-                    let response = await fetch(url);
-                    if (!response.ok) throw new Error();
-                    const blob = await response.blob();
-                    logoImg.src = URL.createObjectURL(blob);
-                } catch (e) {
-                    console.warn("Direct fetch blocked by CORS, trying proxy...");
-                    const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
-                    try {
-                        const response = await fetch(proxyUrl);
-                        const blob = await response.blob();
-                        logoImg.src = URL.createObjectURL(blob);
-                    } catch (proxyError) {
-                        console.error("All fetch methods failed.");
-                        fallbackText.style.display = 'block';
-                    }
-                }
-            }
-
-            logoImg.onload = () => {
-                logoImgElement.src = logoImg.src;
-                logoImgElement.style.display = 'block';
-                fallbackText.style.display = 'none';
-                isLogoLoaded = true;
-            };
-
-            fetchAndLoadImage(DISCORD_IMAGE_URL);
+        async function init() {
+            logoImg.src = LOGO_URL;
+            logoImg.onload = () => { isLogoLoaded = true; };
 
             try {
                 const workerResponse = await fetch('https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js');
                 const workerCode = await workerResponse.text();
-                const blob = new Blob([workerCode], { type: 'application/javascript' });
-                workerBlobUrl = URL.createObjectURL(blob);
-            } catch (e) {
-                console.error("Worker fetch failed.", e);
-            }
+                workerBlobUrl = URL.createObjectURL(new Blob([workerCode], { type: 'application/javascript' }));
+            } catch (e) { console.error("Worker failed"); }
         }
-        prepareAssets();
+        init();
 
         const perimeter = (WIDTH * 2) + (HEIGHT * 2);
-        
         function getPointOnPerimeter(dist) {
             dist = ((dist % perimeter) + perimeter) % perimeter;
             if (dist < WIDTH) return { x: dist, y: 0 };
@@ -375,228 +246,166 @@
         }
 
         let frameCount = 0;
-        const ANIMATION_FRAMES = 180;
-        const DELAY_FRAMES = 120;
-        const TOTAL_CYCLE = ANIMATION_FRAMES + DELAY_FRAMES; 
+        const ANIMATION_FRAMES = 120;
+        const DELAY_FRAMES = 60;
+        const TOTAL_CYCLE = ANIMATION_FRAMES + DELAY_FRAMES;
 
-        function drawSingleChaser(ctx, progress) {
-            const lineLength = perimeter * 0.75;
-            const totalTravel = perimeter + lineLength; 
-            const headDist = progress * totalTravel;
-            
-            ctx.save();
-            ctx.lineCap = "round";
-            ctx.lineJoin = "round";
+        // Function to draw an elongated diamond path
+        function drawTallerDiamondPath(ctx, w, h) {
+            const hw = w / 2;
+            const hh = h / 2;
             ctx.beginPath();
-            
-            let firstPoint = true;
-            const steps = 300; 
-            for (let i = 0; i <= steps; i++) {
-                const ratio = i / steps;
-                const dist = headDist - (lineLength * (1 - ratio));
-                if (dist >= 0 && dist <= perimeter) {
-                    const pos = getPointOnPerimeter(dist);
-                    if (firstPoint) {
-                        ctx.moveTo(pos.x, pos.y);
-                        firstPoint = false;
-                    } else {
-                        ctx.lineTo(pos.x, pos.y);
-                    }
-                }
-            }
-
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
-            ctx.strokeStyle = "rgba(192, 38, 211, 0.9)";
-            ctx.lineWidth = BORDER_THICKNESS;
-            ctx.stroke();
-
-            ctx.shadowBlur = 8;
-            ctx.shadowColor = "white";
-            ctx.strokeStyle = "white";
-            ctx.lineWidth = BORDER_THICKNESS * 0.35;
-            ctx.stroke();
-            ctx.restore();
+            ctx.moveTo(0, -hh); // Top
+            ctx.lineTo(hw, 0);  // Right
+            ctx.lineTo(0, hh);  // Bottom
+            ctx.lineTo(-hw, 0); // Left
+            ctx.closePath();
         }
 
-        function drawDiamondPiece(ctx, x, y, size, rotationDeg, progress) {
+        function drawFullDiamond(ctx, x, y, w, h, progress) {
             ctx.save();
             ctx.translate(x, y);
-            
-            // Draw standard diamond background
+
+            // 1. Static Dark Background
             ctx.save();
-            ctx.rotate(45 * Math.PI / 180);
-            ctx.beginPath();
-            ctx.rect(-size/2, -size/2, size, size);
+            drawTallerDiamondPath(ctx, w, h);
             ctx.fillStyle = "#0c061d";
+            ctx.shadowBlur = 40;
+            ctx.shadowColor = "rgba(168, 85, 247, 0.4)";
             ctx.fill();
-            
-            // Draw subtle static border
-            ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-            ctx.lineWidth = 4;
+            ctx.strokeStyle = "rgba(255,255,255,0.15)";
+            ctx.lineWidth = 2;
             ctx.stroke();
             ctx.restore();
-            
-            // Draw rotating edge glow
+
+            // 2. Logo (with pulse)
+            if (isLogoLoaded) {
+                const pulse = 1 + (progress > 0 ? Math.sin(progress * Math.PI * 2) * 0.04 : 0);
+                const s = 190 * pulse; // Adjusted size for the taller container
+                ctx.save();
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = "#c026d3";
+                ctx.drawImage(logoImg, -s/2, -s/2, s, s);
+                ctx.restore();
+            }
+
+            // 3. Animated Glow Sweep
             if (progress > 0) {
                 ctx.save();
-                ctx.rotate(45 * Math.PI / 180);
-                
-                // Define the diamond path for clipping/stroking
-                ctx.beginPath();
-                ctx.rect(-size/2, -size/2, size, size);
-                
-                // Use stroke clip logic to only draw on edge
-                ctx.lineWidth = 8;
-                ctx.globalCompositeOperation = 'source-over';
-                
-                // Draw the sweeping gradient glow on the stroke only
-                ctx.save();
-                ctx.rotate(-45 * Math.PI / 180); // Unrotate so gradient spins relative to screen
-                ctx.rotate(progress * Math.PI * 2);
-                
-                const grad = ctx.createConicGradient(0, 0, 0);
+                // Conic gradient that rotates
+                const grad = ctx.createConicGradient(progress * Math.PI * 2, 0, 0);
                 grad.addColorStop(0, "transparent");
                 grad.addColorStop(0.1, "white");
                 grad.addColorStop(0.2, "rgba(168, 85, 247, 1)");
-                grad.addColorStop(0.4, "transparent");
-                
+                grad.addColorStop(0.3, "transparent");
+                grad.addColorStop(1, "transparent");
+
+                ctx.lineJoin = "miter";
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "rgba(168, 85, 247, 0.8)";
                 ctx.strokeStyle = grad;
                 ctx.lineWidth = 10;
+                drawTallerDiamondPath(ctx, w, h);
                 ctx.stroke();
-                ctx.restore();
-                
+
+                // Core detail line
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = "white";
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.5;
+                drawTallerDiamondPath(ctx, w, h);
+                ctx.stroke();
                 ctx.restore();
             }
 
-            // Draw Logo
-            if (isLogoLoaded && logoImg.complete && logoImg.naturalWidth !== 0) {
-                const pulse = 1 + Math.sin(Date.now() / 500) * 0.04;
-                const imgSize = 200 * (progress > 0 ? pulse : 1);
-                ctx.save();
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
-                ctx.drawImage(logoImg, -imgSize/2, -imgSize/2, imgSize, imgSize);
-                ctx.restore();
-            } else {
-                ctx.fillStyle = "white";
-                ctx.font = "bold 60px Merriweather";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = "rgba(192, 38, 211, 0.8)";
-                ctx.fillText("NTE", 0, 0);
-            }
             ctx.restore();
         }
 
-        const particles = Array.from({ length: 45 }, () => ({
+        function drawBannerBorder(ctx, progress) {
+            if (progress <= 0) return;
+            const lineLength = perimeter * 0.7;
+            const headDist = progress * (perimeter + lineLength);
+            
+            ctx.save();
+            ctx.lineCap = "round";
+            ctx.beginPath();
+            for (let i = 0; i <= 200; i++) {
+                const d = headDist - (lineLength * (1 - i/200));
+                if (d >= 0 && d <= perimeter) {
+                    const p = getPointOnPerimeter(d);
+                    if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+                }
+            }
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#a855f7";
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 6;
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        const stars = Array.from({ length: 40 }, () => ({
             x: Math.random() * WIDTH,
             y: Math.random() * HEIGHT,
-            size: Math.random() * 1.5 + 0.5,
-            speed: Math.random() * 0.15 + 0.05,
-            opacity: Math.random() * 0.4,
-            fade: Math.random() * 0.002 + 0.001
+            s: Math.random() * 2,
+            v: Math.random() * 0.5 + 0.1
         }));
 
         function animate() {
             frameCount = (frameCount + 1) % TOTAL_CYCLE;
             sCtx.clearRect(0, 0, WIDTH, HEIGHT);
-            bCtx.clearRect(0, 0, WIDTH, HEIGHT);
+            mCtx.clearRect(0, 0, WIDTH, HEIGHT);
 
-            if (frameCount >= DELAY_FRAMES) {
-                const progress = (frameCount - DELAY_FRAMES) / ANIMATION_FRAMES;
-                drawSingleChaser(bCtx, progress);
-                diamondGlow.style.display = 'block';
-                const rotation = -45 + (progress * 360);
-                diamondGlow.style.transform = `rotate(${rotation}deg)`;
+            const progress = frameCount >= DELAY_FRAMES ? (frameCount - DELAY_FRAMES) / ANIMATION_FRAMES : 0;
 
-                if (frameCount === DELAY_FRAMES) triggerFlash(flashStart);
-                if (frameCount === TOTAL_CYCLE - 1) triggerFlash(flashEnd);
-            } else {
-                diamondGlow.style.display = 'none';
-            }
+            if (frameCount === DELAY_FRAMES) triggerFlash(flashStart);
+            if (frameCount === TOTAL_CYCLE - 1) triggerFlash(flashEnd);
 
-            particles.forEach(p => {
-                p.y -= p.speed;
-                p.opacity -= p.fade;
-                if (p.y < -5 || p.opacity <= 0) {
-                    p.x = Math.random() * WIDTH;
-                    p.y = HEIGHT + 5;
-                    p.opacity = Math.random() * 0.4;
-                }
-                sCtx.beginPath();
-                sCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                sCtx.fillStyle = `rgba(216, 180, 254, ${p.opacity})`;
-                sCtx.fill();
+            stars.forEach(p => {
+                p.y -= p.v; if (p.y < 0) p.y = HEIGHT;
+                sCtx.fillStyle = "rgba(255,255,255,0.3)";
+                sCtx.fillRect(p.x, p.y, p.s, p.s);
             });
+
+            drawBannerBorder(mCtx, progress);
+            drawFullDiamond(mCtx, WIDTH/2, HEIGHT/2, BASE_WIDTH, BASE_HEIGHT, progress);
 
             requestAnimationFrame(animate);
         }
 
-        function triggerFlash(element) {
-            element.classList.remove('active-flash');
-            void element.offsetWidth; 
-            element.classList.add('active-flash');
+        function triggerFlash(el) {
+            el.classList.remove('active-flash');
+            void el.offsetWidth;
+            el.classList.add('active-flash');
         }
 
-        exportBtn.onclick = async () => {
-            if (!workerBlobUrl) {
-                alert("GIF engine is still loading. Please try again in a moment.");
-                return;
-            }
-
+        exportBtn.onclick = () => {
+            if (!workerBlobUrl) return;
             exportBtn.disabled = true;
-            exportBtn.innerText = "Capturing Diamond...";
             progContainer.style.display = 'block';
-            
-            const CAP_SIZE = 400;
-            captureCanvas.width = CAP_SIZE;
-            captureCanvas.height = CAP_SIZE;
 
             const gif = new GIF({
-                workers: 2,
-                quality: 5,
-                width: CAP_SIZE,
-                height: CAP_SIZE,
-                workerScript: workerBlobUrl,
-                transparent: 'rgba(0,0,0,0)' 
+                workers: 2, quality: 10, width: 400, height: 400,
+                workerScript: workerBlobUrl, transparent: 'rgba(0,0,0,0)'
             });
 
             for (let f = 0; f < TOTAL_CYCLE; f++) {
-                cCtx.clearRect(0, 0, CAP_SIZE, CAP_SIZE);
-                let progress = f >= DELAY_FRAMES ? (f - DELAY_FRAMES) / ANIMATION_FRAMES : 0;
-
-                drawDiamondPiece(cCtx, CAP_SIZE/2, CAP_SIZE/2, 220, 0, progress);
-
-                try {
-                    gif.addFrame(cCtx, {copy: true, delay: 1000/60});
-                } catch (e) {
-                    console.error("Frame capture failed:", e);
-                    break;
-                }
-                
-                const p = Math.round((f / TOTAL_CYCLE) * 50);
-                progBar.style.width = p + "%";
+                cCtx.clearRect(0, 0, 400, 400);
+                const p = f >= DELAY_FRAMES ? (f - DELAY_FRAMES) / ANIMATION_FRAMES : 0;
+                // Center in the 400x400 capture box
+                drawFullDiamond(cCtx, 200, 200, BASE_WIDTH, BASE_HEIGHT, p);
+                gif.addFrame(cCtx, {copy: true, delay: 16});
             }
 
-            gif.on('progress', (p) => {
-                progBar.style.width = (50 + (p * 50)) + "%";
-            });
-
-            gif.on('finished', (blob) => {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = 'nte-diamond-only.gif';
-                link.click();
-                
+            gif.on('progress', p => progBar.style.width = (p * 100) + "%");
+            gif.on('finished', blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'nte-taller-diamond.gif';
+                a.click();
                 exportBtn.disabled = false;
-                exportBtn.innerText = "Record Diamond Only GIF";
                 progContainer.style.display = 'none';
-                progBar.style.width = "0%";
             });
-
             gif.render();
         };
 
